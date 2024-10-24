@@ -19,6 +19,11 @@ export default class ListviewViewController extends mwf.ViewController {
      */
     async oncreate() {
         // TODO: do databinding, set listeners, initialise the view
+        this.addNewMediaItemElement =
+            this.root.querySelector("#addNewMediaItem");
+        this.addNewMediaItemElement.onclick = (() => {
+            this.addToListview(new entities.MediaItem("m new","https://picsum.photos/100/100"));
+        });
         this.initialiseListview(this.items);
 
         // call the superclass once creation is done
