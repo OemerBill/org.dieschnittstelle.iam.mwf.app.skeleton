@@ -4,6 +4,7 @@
 import {mwf} from "vfh-iam-mwf-base";
 import {mwfUtils} from "vfh-iam-mwf-base";
 import * as entities from "../model/MyEntities.js";
+import {GenericCRUDImplLocal} from "vfh-iam-mwf-base";
 
 export default class ListviewViewController extends mwf.ViewController {
 
@@ -19,12 +20,16 @@ export default class ListviewViewController extends mwf.ViewController {
      */
     async oncreate() {
         // TODO: do databinding, set listeners, initialise the view
-        this.addNewMediaItemElement =
-            this.root.querySelector("#addNewMediaItem");
+        this.addNewMediaItemElement = this.root.querySelector("#addNewMediaItem");
         this.addNewMediaItemElement.onclick = (() => {
-            this.addToListview(new entities.MediaItem("m new","https://picsum.photos/100/100"));
+            this.crudops.create(new entities.MediaItem("m","https://picsum.photos/100/100")).then((created) => {
+                this.addToListview(created);
+            })
         });
         this.initialiseListview(this.items);
+        this.crudops.readAll().then((items) => {
+            this.initialiseListview(items);
+        });
 
         // call the superclass once creation is done
         super.oncreate();
@@ -44,6 +49,9 @@ export default class ListviewViewController extends mwf.ViewController {
             new
             entities.MediaItem("m3","https://picsum.photos/150/200")
         ];
+
+        this.crudops =
+            GenericCRUDImplLocal.newInstance("MediaItem");
     }
 
     /*
@@ -61,7 +69,7 @@ export default class ListviewViewController extends mwf.ViewController {
     bindListItemView(listviewid, itemview, itemobj) {
         // TODO: implement how attributes of itemobj shall be displayed in itemview
         itemview.root.getElementsByTagName("img")[0].src = itemobj.src;
-        itemview.root.getElementsByTagName("h2")[0].textContent = itemobj.title;
+        itemview.root.getElementsByTagName("h2")[0].textContent = itemobj.title+itemobj._id
         itemview.root.getElementsByTagName("h3")[0].textContent = new Date(itemobj.added).toLocaleDateString();
     }
 
@@ -71,7 +79,7 @@ export default class ListviewViewController extends mwf.ViewController {
      */
     onListItemSelected(itemobj, listviewid) {
         // TODO: implement how selection of itemobj shall be handled
-        alert("Element " + itemobj.title + " wurde ausgewählt!");
+        alert("Element " + itemobj.title + itemobj._id + " wurde ausgewählt!");
     }
 
     /*
