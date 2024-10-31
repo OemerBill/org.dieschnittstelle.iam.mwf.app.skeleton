@@ -22,11 +22,11 @@ export default class ListviewViewController extends mwf.ViewController {
         // TODO: do databinding, set listeners, initialise the view
         this.addNewMediaItemElement = this.root.querySelector("#addNewMediaItem");
         this.addNewMediaItemElement.onclick = (() => {
-            this.crudops.create(new entities.MediaItem("m","https://picsum.photos/100/100")).then((created) => {
+            this.crudops.create(this.createRandomMediaItem()).then((created) => {
                 this.addToListview(created);
             })
         });
-        this.initialiseListview(this.items);
+
         this.crudops.readAll().then((items) => {
             this.initialiseListview(items);
         });
@@ -41,15 +41,6 @@ export default class ListviewViewController extends mwf.ViewController {
 
         console.log("ListviewViewController()");
 
-        this.items = [
-            new
-            entities.MediaItem("m1","https://picsum.photos/100/100"),
-            new
-            entities.MediaItem("m2","https://picsum.photos/200/150"),
-            new
-            entities.MediaItem("m3","https://picsum.photos/150/200")
-        ];
-
         this.crudops =
             GenericCRUDImplLocal.newInstance("MediaItem");
     }
@@ -63,31 +54,12 @@ export default class ListviewViewController extends mwf.ViewController {
     }
 
     /*
-     * for views with listviews: bind a list item to an item view
-     * TODO: delete if no listview is used or if databinding uses ractive templates
-     */
-    bindListItemView(listviewid, itemview, itemobj) {
-        // TODO: implement how attributes of itemobj shall be displayed in itemview
-        itemview.root.getElementsByTagName("img")[0].src = itemobj.src;
-        itemview.root.getElementsByTagName("h2")[0].textContent = itemobj.title+itemobj._id
-        itemview.root.getElementsByTagName("h3")[0].textContent = new Date(itemobj.added).toLocaleDateString();
-    }
-
-    /*
      * for views with listviews: react to the selection of a listitem
      * TODO: delete if no listview is used or if item selection is specified by targetview/targetaction
      */
     onListItemSelected(itemobj, listviewid) {
         // TODO: implement how selection of itemobj shall be handled
         alert("Element " + itemobj.title + itemobj._id + " wurde ausgewählt!");
-    }
-
-    /*
-     * for views with listviews: react to the selection of a listitem menu option
-     * TODO: delete if no listview is used or if item selection is specified by targetview/targetaction
-     */
-    onListItemMenuItemSelected(menuitemview, itemobj, listview) {
-        // TODO: implement how selection of the option menuitemview for itemobj shall be handled
     }
 
     /*
@@ -101,4 +73,24 @@ export default class ListviewViewController extends mwf.ViewController {
         // TODO: implement action bindings for dialog, accessing dialog.root
     }
 
+    createRandomMediaItem() {
+        const newMediaItem = new entities.MediaItem();
+        const randomNumber = Date.now();
+        const randomImageSize = Math.floor(Math.random() * 100) + 100;
+        newMediaItem.title = `Random Media Item ${randomNumber}`;
+        newMediaItem.src = `https://picsum.photos/${randomImageSize}/${randomImageSize}`;
+        return newMediaItem;
+    }
+
+    deleteItem(item) {
+        this.crudops.delete(item._id).then(() => {
+            this.removeFromListview(item._id);
+        });
+    }
+    editItem(item) {
+        item.title = (item.title + item.title);
+        this.crudops.update(item._id,item).then(() => {
+            this.updateInListview(item._id,item);
+        });
+    }
 }
