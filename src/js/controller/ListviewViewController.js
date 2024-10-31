@@ -22,11 +22,11 @@ export default class ListviewViewController extends mwf.ViewController {
         // TODO: do databinding, set listeners, initialise the view
         this.addNewMediaItemElement = this.root.querySelector("#addNewMediaItem");
         this.addNewMediaItemElement.onclick = (() => {
-            this.crudops.create(new entities.MediaItem("m","https://picsum.photos/100/100")).then((created) => {
+            this.crudops.create(this.createRandomMediaItem()).then((created) => {
                 this.addToListview(created);
             })
         });
-        this.initialiseListview(this.items);
+
         this.crudops.readAll().then((items) => {
             this.initialiseListview(items);
         });
@@ -40,15 +40,6 @@ export default class ListviewViewController extends mwf.ViewController {
         super();
 
         console.log("ListviewViewController()");
-
-        this.items = [
-            new
-            entities.MediaItem("m1","https://picsum.photos/100/100"),
-            new
-            entities.MediaItem("m2","https://picsum.photos/200/150"),
-            new
-            entities.MediaItem("m3","https://picsum.photos/150/200")
-        ];
 
         this.crudops =
             GenericCRUDImplLocal.newInstance("MediaItem");
@@ -72,15 +63,6 @@ export default class ListviewViewController extends mwf.ViewController {
     }
 
     /*
-     * for views with listviews: react to the selection of a listitem menu option
-     * TODO: delete if no listview is used or if item selection is specified by targetview/targetaction
-     */
-    onListItemMenuItemSelected(menuitemview, itemobj, listview) {
-        // TODO: implement how selection of the option menuitemview for itemobj shall be handled
-        super.onListItemMenuItemSelected(menuitemview, itemobj, listview);
-    }
-
-    /*
      * for views with dialogs
      * TODO: delete if no dialogs are used or if generic controller for dialogs is employed
      */
@@ -89,6 +71,15 @@ export default class ListviewViewController extends mwf.ViewController {
         super.bindDialog(dialogid, dialogview, dialogdataobj);
 
         // TODO: implement action bindings for dialog, accessing dialog.root
+    }
+
+    createRandomMediaItem() {
+        const newMediaItem = new entities.MediaItem();
+        const randomNumber = Date.now();
+        const randomImageSize = Math.floor(Math.random() * 100) + 100;
+        newMediaItem.title = `Random Media Item ${randomNumber}`;
+        newMediaItem.src = `https://picsum.photos/${randomImageSize}/${randomImageSize}`;
+        return newMediaItem;
     }
 
     deleteItem(item) {
