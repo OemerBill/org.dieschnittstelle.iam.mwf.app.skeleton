@@ -4,7 +4,6 @@
 import {mwf} from "vfh-iam-mwf-base";
 import {mwfUtils} from "vfh-iam-mwf-base";
 import * as entities from "../model/MyEntities.js";
-import {GenericCRUDImplLocal} from "vfh-iam-mwf-base";
 
 export default class ListviewViewController extends mwf.ViewController {
 
@@ -22,12 +21,10 @@ export default class ListviewViewController extends mwf.ViewController {
         // TODO: do databinding, set listeners, initialise the view
         this.addNewMediaItemElement = this.root.querySelector("#addNewMediaItem");
         this.addNewMediaItemElement.onclick = (() => {
-            this.crudops.create(this.createRandomMediaItem()).then((created) => {
-                this.addToListview(created);
-            })
+            this.createRandomMediaItem();
         });
 
-        this.crudops.readAll().then((items) => {
+        entities.MediaItem.readAll().then((items) => {
             this.initialiseListview(items);
         });
 
@@ -40,9 +37,6 @@ export default class ListviewViewController extends mwf.ViewController {
         super();
 
         console.log("ListviewViewController()");
-
-        this.crudops =
-            GenericCRUDImplLocal.newInstance("MediaItem");
     }
 
     /*
@@ -77,20 +71,31 @@ export default class ListviewViewController extends mwf.ViewController {
         const newMediaItem = new entities.MediaItem();
         const randomNumber = Date.now();
         const randomImageSize = Math.floor(Math.random() * 100) + 100;
+
         newMediaItem.title = `Random Media Item ${randomNumber}`;
         newMediaItem.src = `https://picsum.photos/${randomImageSize}/${randomImageSize}`;
+        newMediaItem.create().then(() => {
+            this.addToListview(newMediaItem);
+        });
         return newMediaItem;
     }
 
     deleteItem(item) {
-        this.crudops.delete(item._id).then(() => {
+        item.delete().then(() => {
             this.removeFromListview(item._id);
         });
     }
     editItem(item) {
         item.title = (item.title + item.title);
-        this.crudops.update(item._id,item).then(() => {
+        item.update().then(() => {
             this.updateInListview(item._id,item);
+        });
+    }
+
+    createNewItem() {
+        const newItem = new entities.MediaItem("m","https://picsum.photos/100/100");
+        newItem.create().then(() => {
+            this.addToListview(newItem);
         });
     }
 }
