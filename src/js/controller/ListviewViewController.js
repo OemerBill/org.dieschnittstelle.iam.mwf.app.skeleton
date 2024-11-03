@@ -21,7 +21,6 @@ export default class ListviewViewController extends mwf.ViewController {
         // TODO: do databinding, set listeners, initialise the view
         this.addNewMediaItemElement = this.root.querySelector("#addNewMediaItem");
         this.addNewMediaItemElement.onclick = (() => {
-            // this.createRandomMediaItem();
             this.createNewItem();
         });
 
@@ -87,9 +86,21 @@ export default class ListviewViewController extends mwf.ViewController {
         });
     }
     editItem(item) {
-        item.title = (item.title + item.title);
-        item.update().then(() => {
-            this.updateInListview(item._id,item);
+        this.showDialog("mediaItemDialog", {
+            item: item,
+            actionBindings: {
+                submitForm: ((event) => {
+                    event.original.preventDefault();
+                    item.update().then(() => {
+                        this.updateInListview(item._id,item);
+                    });
+                    this.hideDialog();
+                }),
+                deleteItem: ((event) => {
+                    this.deleteItem(item);
+                    this.hideDialog();
+                })
+            }
         });
     }
 
