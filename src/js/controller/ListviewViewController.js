@@ -21,7 +21,8 @@ export default class ListviewViewController extends mwf.ViewController {
         // TODO: do databinding, set listeners, initialise the view
         this.addNewMediaItemElement = this.root.querySelector("#addNewMediaItem");
         this.addNewMediaItemElement.onclick = (() => {
-            this.createRandomMediaItem();
+            // this.createRandomMediaItem();
+            this.createNewItem();
         });
 
         entities.MediaItem.readAll().then((items) => {
@@ -93,9 +94,18 @@ export default class ListviewViewController extends mwf.ViewController {
     }
 
     createNewItem() {
-        const newItem = new entities.MediaItem("m","https://picsum.photos/100/100");
-        newItem.create().then(() => {
-            this.addToListview(newItem);
+        const newItem = new entities.MediaItem("","https://picsum.photos/100/100");
+        this.showDialog("mediaItemDialog",{
+            item: newItem,
+            actionBindings: {
+                submitForm: ((event) => {
+                    event.original.preventDefault();
+                    newItem.create().then(() => {
+                        this.addToListview(newItem);
+                    });
+                    this.hideDialog();
+                })
+            }
         });
     }
 }
