@@ -34,7 +34,7 @@
     </header>
     <main class="mwf-scrollview">
         <ul class="mwf-listview" data-mwf-listitem-view="myapp-listitem" data-mwf-listitem-menu="mediaItemMenu">
-            <li class="mwf-listitem mwf-li-title-subtitle mwf-template mwf-databind" data-mwf-templatename="myapp-listitem">
+            <li class="mwf-listitem mwf-li-title-subtitle mwf-template mwf-databind" data-mwf-templatename="myapp-listitem" data-mwf-targetview="mediaReadview">>
                 <img class="mwf-left-align" src="{{src}}"/>
                 <div class="mwf-li-titleblock">
                     <h2>{{title}}{{_id}}</h2>
@@ -70,7 +70,7 @@
         </form>
     </main>
 </div>
-<div class="mwf-view" id="mediaReadview">
+<div class="mwf-view" id="mediaReadview" data-mwf-viewcontroller="ReadviewViewController">
     <div class="mwf-template mwf-databind" data-mwf-templatename="mediaReadviewTemplate">
     <header>
         <button class="mwf-imgbutton mwf-img-sandwich mwf-left-align"></button>

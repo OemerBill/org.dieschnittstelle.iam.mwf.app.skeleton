@@ -45,6 +45,9 @@ export default class ListviewViewController extends mwf.ViewController {
      */
     async onReturnFromNextView(nextviewid, returnValue, returnStatus) {
         // TODO: check from which view, and possibly with which status, we are returning, and handle returnValue accordingly
+        if (nextviewid === "mediaReadview" && returnValue && returnValue.deletedItem) {
+            this.removeFromListview(returnValue.deletedItem._id);
+        }
     }
 
     /*
@@ -53,7 +56,7 @@ export default class ListviewViewController extends mwf.ViewController {
      */
     onListItemSelected(itemobj, listviewid) {
         // TODO: implement how selection of itemobj shall be handled
-        alert("Element " + itemobj.title + itemobj._id + " wurde ausgewählt!");
+        this.nextView("mediaReadview",{item: itemobj});
     }
 
     /*
@@ -81,7 +84,7 @@ export default class ListviewViewController extends mwf.ViewController {
     }
 
     deleteItem(item) {
-        item.delete().then(() => {
+        item.delete(() => {
             this.removeFromListview(item._id);
         });
     }
