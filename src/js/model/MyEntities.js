@@ -34,11 +34,11 @@ export class MediaItem extends EntityManager.Entity {
         this.title = title;
         this.src = src;
         this.contentType = contentType;
-        this.added = new Date(Date.now()).toLocaleDateString();
+        this.added = Date.now();
     }
 
     get addedDateString() {
-        return (new Date(this.added)).toLocaleDateString();
+        return new Date(this.added).toLocaleDateString();
     }
     get mediaType() {
         if (this.contentType) {
