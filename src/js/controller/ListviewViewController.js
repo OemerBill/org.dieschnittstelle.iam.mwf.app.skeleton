@@ -2,7 +2,6 @@
  * @author Jörn Kreutel
  */
 import {mwf} from "vfh-iam-mwf-base";
-import {mwfUtils} from "vfh-iam-mwf-base";
 import * as entities from "../model/MyEntities.js";
 
 export default class ListviewViewController extends mwf.ViewController {
@@ -92,8 +91,10 @@ export default class ListviewViewController extends mwf.ViewController {
         });
     }
 
-    createNewItem() {
-        const newItem = new entities.MediaItem("","https://picsum.photos/100/100");
+    async createNewItem() {
+        const response = await fetch("https://picsum.photos/1000/1000");
+        const image = response.url;
+        const newItem = new entities.MediaItem("",image);
         this.showDialog("mediaItemDialog",{
             item: newItem,
             actionBindings: {

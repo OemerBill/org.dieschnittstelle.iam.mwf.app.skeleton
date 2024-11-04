@@ -18,7 +18,7 @@ export default class ReadviewViewController extends mwf.ViewController {
      */
     async oncreate() {
         // TODO: do databinding, set listeners, initialise the view
-        const mediaItem = this.args.item; //new entities.MediaItem("m", "https://picsum.photos/300/400");
+        const mediaItem = this.args.item;
         this.viewProxy = this.bindElement("mediaReadviewTemplate",{item: mediaItem},this.root).viewProxy;
         this.viewProxy.bindAction("deleteItem",(() => {
             mediaItem.delete().then(() => {
