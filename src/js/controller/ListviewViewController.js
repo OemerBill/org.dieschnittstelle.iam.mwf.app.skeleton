@@ -13,6 +13,12 @@ export default class ListviewViewController extends mwf.ViewController {
     items;
     addNewMediaItemElement;
 
+    constructor() {
+        super();
+
+        console.log("ListviewViewController()");
+    }
+
     /*
      * for any view: initialise the view
      */
@@ -41,13 +47,6 @@ export default class ListviewViewController extends mwf.ViewController {
 
         // call the superclass once creation is done
         super.oncreate();
-    }
-
-
-    constructor() {
-        super();
-
-        console.log("ListviewViewController()");
     }
 
     /*
