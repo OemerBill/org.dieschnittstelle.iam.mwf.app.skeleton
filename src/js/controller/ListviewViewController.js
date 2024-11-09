@@ -2,7 +2,6 @@
  * @author Jörn Kreutel
  */
 import {mwf} from "vfh-iam-mwf-base";
-import {mwfUtils} from "vfh-iam-mwf-base";
 import * as entities from "../model/MyEntities.js";
 
 export default class ListviewViewController extends mwf.ViewController {
@@ -14,25 +13,6 @@ export default class ListviewViewController extends mwf.ViewController {
     items;
     addNewMediaItemElement;
 
-    /*
-     * for any view: initialise the view
-     */
-    async oncreate() {
-        // TODO: do databinding, set listeners, initialise the view
-        this.addNewMediaItemElement = this.root.querySelector("#addNewMediaItem");
-        this.addNewMediaItemElement.onclick = (() => {
-            this.createNewItem();
-        });
-
-        entities.MediaItem.readAll().then((items) => {
-            this.initialiseListview(items);
-        });
-
-        // call the superclass once creation is done
-        super.oncreate();
-    }
-
-
     constructor() {
         super();
 
@@ -40,11 +20,29 @@ export default class ListviewViewController extends mwf.ViewController {
     }
 
     /*
-     * for views that initiate transitions to other views
-     * NOTE: return false if the view shall not be returned to, e.g. because we immediately want to display its previous view. Otherwise, do not return anything.
+     * for any view: initialise the view
      */
-    async onReturnFromNextView(nextviewid, returnValue, returnStatus) {
-        // TODO: check from which view, and possibly with which status, we are returning, and handle returnValue accordingly
+    async oncreate() {
+        // TODO: do databinding, set listeners, initialise the view
+        this.addNewMediaItemElement = this.root.querySelector("header .mwf-img-plus");
+        this.addNewMediaItemElement.onclick = (() => {
+            this.createNewItem();
+        });
+        this.addListener(new mwf.EventMatcher("crud","created","MediaItem"), ((event) => {
+                this.addToListview(event.data);
+            })
+        );
+        this.addListener(new mwf.EventMatcher("crud","updated","MediaItem"), ((event) => {
+                this.updateInListview(event.data._id, event.data);
+            })
+        );
+        this.addListener(new mwf.EventMatcher("crud","deleted","MediaItem"), ((event) => {
+                this.removeFromListview(event.data);
+            })
+        );
+
+        // call the superclass once creation is done
+        super.oncreate();
     }
 
     /*
@@ -53,7 +51,7 @@ export default class ListviewViewController extends mwf.ViewController {
      */
     onListItemSelected(itemobj, listviewid) {
         // TODO: implement how selection of itemobj shall be handled
-        alert("Element " + itemobj.title + itemobj._id + " wurde ausgewählt!");
+        this.nextView("mediaReadview",{item: itemobj});
     }
 
     /*
@@ -67,33 +65,17 @@ export default class ListviewViewController extends mwf.ViewController {
         // TODO: implement action bindings for dialog, accessing dialog.root
     }
 
-    createRandomMediaItem() {
-        const newMediaItem = new entities.MediaItem();
-        const randomNumber = Date.now();
-        const randomImageSize = Math.floor(Math.random() * 100) + 100;
-
-        newMediaItem.title = `Random Media Item ${randomNumber}`;
-        newMediaItem.src = `https://picsum.photos/${randomImageSize}/${randomImageSize}`;
-        newMediaItem.create().then(() => {
-            this.addToListview(newMediaItem);
-        });
-        return newMediaItem;
-    }
-
     deleteItem(item) {
-        item.delete().then(() => {
-            this.removeFromListview(item._id);
-        });
+        item.delete(() => {});
     }
+
     editItem(item) {
         this.showDialog("mediaItemDialog", {
             item: item,
             actionBindings: {
                 submitForm: ((event) => {
                     event.original.preventDefault();
-                    item.update().then(() => {
-                        this.updateInListview(item._id,item);
-                    });
+                    item.update().then(() => {});
                     this.hideDialog();
                 }),
                 deleteItem: ((event) => {
@@ -104,19 +86,27 @@ export default class ListviewViewController extends mwf.ViewController {
         });
     }
 
-    createNewItem() {
-        const newItem = new entities.MediaItem("","https://picsum.photos/100/100");
+    async createNewItem() {
+        const response = await fetch("https://picsum.photos/1000/1000");
+        const image = response.url;
+        const newItem = new entities.MediaItem("",image);
         this.showDialog("mediaItemDialog",{
             item: newItem,
             actionBindings: {
                 submitForm: ((event) => {
                     event.original.preventDefault();
-                    newItem.create().then(() => {
-                        this.addToListview(newItem);
-                    });
+                    newItem.create().then(() => {});
                     this.hideDialog();
                 })
             }
         });
+    }
+
+    async onresume() {
+        entities.MediaItem.readAll().then((items) => {
+            this.initialiseListview(items);
+        });
+
+        return super.onresume();
     }
 }
