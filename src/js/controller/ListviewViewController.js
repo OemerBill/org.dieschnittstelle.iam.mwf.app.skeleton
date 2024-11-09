@@ -41,10 +41,6 @@ export default class ListviewViewController extends mwf.ViewController {
             })
         );
 
-        entities.MediaItem.readAll().then((items) => {
-            this.initialiseListview(items);
-        });
-
         // call the superclass once creation is done
         super.oncreate();
     }
@@ -104,5 +100,13 @@ export default class ListviewViewController extends mwf.ViewController {
                 })
             }
         });
+    }
+
+    async onresume() {
+        entities.MediaItem.readAll().then((items) => {
+            this.initialiseListview(items);
+        });
+
+        return super.onresume();
     }
 }
