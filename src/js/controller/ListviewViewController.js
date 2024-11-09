@@ -24,7 +24,7 @@ export default class ListviewViewController extends mwf.ViewController {
      */
     async oncreate() {
         // TODO: do databinding, set listeners, initialise the view
-        this.addNewMediaItemElement = this.root.querySelector("#addNewMediaItem");
+        this.addNewMediaItemElement = this.root.querySelector("header .mwf-img-plus");
         this.addNewMediaItemElement.onclick = (() => {
             this.createNewItem();
         });
